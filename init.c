@@ -27,7 +27,7 @@ void load_textures(t_game *game)
 {
     game->wall_tex.img = mlx_xpm_file_to_image(
         game->mlx_ptr,
-        "textures/wall.xpm",
+        "textures/texture1.xpm",
         &game->wall_tex.width,
         &game->wall_tex.height
     );
@@ -36,8 +36,8 @@ void load_textures(t_game *game)
 
     game->wall_tex.addr = mlx_get_data_addr(
         game->wall_tex.img,
-        &game->wall_tex.bpp,
-        &game->wall_tex.line_len,
+        &game->wall_tex.bits_per_pixel,
+        &game->wall_tex.line_length,
         &game->wall_tex.endian
     );
 }
@@ -49,6 +49,9 @@ t_game	*initialize_struct(char *file)
 	game = (t_game *) malloc(sizeof(t_game));
 	if (!game)
 		return (NULL);
+	game->mlx_ptr = mlx_init();
+	if (!game->mlx_ptr)
+		error_exit("error mlx ptr\n", game);
 	game->win_ptr = NULL;
 	game->height = 0;
 	game->lenght = 0;
@@ -57,7 +60,7 @@ t_game	*initialize_struct(char *file)
 	game->last_time = get_time();
 	init_map(file, game);
 	init_player(game);
-	/*load_textures(game);*/
+	load_textures(game);
 	return (game);
 }
 

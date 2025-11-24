@@ -30,13 +30,27 @@
 # define MOVE_SPEED 0.10
 # define ROT_SPEED 0.10
 
-typedef struct	s_data {
+typedef struct	s_data
+{
 	void	*img;
 	char	*addr;
 	int		bits_per_pixel;
 	int		line_length;
 	int		endian;
-}				t_data;
+}	t_data;
+
+typedef struct	s_line
+{
+	double	wallheight;
+	int 	x;
+	int 	y;
+	int 	drawstart;
+	int 	drawend;
+	int 	tex_x;
+	int 	tex_y;
+	int 	tex_step;
+	int 	tex_pos;
+}	t_line;
 
 typedef struct s_tex
 {
@@ -44,8 +58,8 @@ typedef struct s_tex
     char    *addr;
     int     width;
     int     height;
-    int     bpp;
-    int     line_len;
+    int     bits_per_pixel;
+    int     line_length;
     int     endian;
 }   t_tex;
 
@@ -64,6 +78,7 @@ typedef struct s_ray
 	double	sidedistY;
 	double	cameraX;
 	double	walldist;
+	double	wall_x;
 }	t_ray;
 
 typedef struct s_player
@@ -119,7 +134,7 @@ void	dda_analysis(t_game *game, t_ray *ray);
 t_ray	init_ray(t_game *game, int x);
 //Rendering
 void	my_mlx_pixel_put(t_data *data, int x, int y, int color);
-void	draw_column(t_ray *ray, int x, t_data *img);
+void	draw_column(t_ray *ray, int x, t_data *img, t_tex tex);
 void	render(t_game *game);
 //Utils
 void	error_exit(char *str, t_game *game);

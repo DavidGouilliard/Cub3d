@@ -26,6 +26,11 @@ int	on_keypress(int keycode, t_game *game)
 	return (0);
 }
 
+int	on_keyrelease(void)
+{
+	return (0);
+}
+
 int	on_destroy(t_game *game)
 {
 	mlx_loop_end(game->mlx_ptr);
@@ -48,6 +53,7 @@ int	render_frame(void *param)
 void	game_loop(t_game *game)
 {
 	mlx_hook(game->win_ptr, 2, 1L << 0, &on_keypress, game);
+	/*mlx_hook(game->win_ptr, 3, 1L << 1, &on_keyrelease, game);*/
 	mlx_hook(game->win_ptr, 17, 0, &on_destroy, game);
 	mlx_loop_hook(game->mlx_ptr, &render_frame, game);
 	mlx_loop(game->mlx_ptr);

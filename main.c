@@ -20,9 +20,6 @@ int	main(int ac, char **av)
 	if (ac != 2)
 		error_exit("wrong argument count\n", game);
 	game = initialize_struct(av[1]);
-	game->mlx_ptr = mlx_init();
-	if (!game->mlx_ptr)
-		return (free(game), 1);
 	/*print_map(game);*/
 	/*print_player(game);*/
 	game->win_ptr = mlx_new_window(game->mlx_ptr, WIN_W, WIN_H, "Cube3d");

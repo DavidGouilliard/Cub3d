@@ -22,6 +22,8 @@ void	free_game(t_game *game)
 		mlx_destroy_window(game->mlx_ptr, game->win_ptr);
 	if (game->img.img)
 		mlx_destroy_image(game->mlx_ptr, game->img.img);
+	if (game->wall_tex.img)
+		mlx_destroy_image(game->mlx_ptr, game->wall_tex.img);
 	mlx_destroy_display(game->mlx_ptr);
 	free(game->mlx_ptr);
 	free(game);

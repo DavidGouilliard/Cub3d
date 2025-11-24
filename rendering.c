@@ -20,27 +20,62 @@ void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
 	*(unsigned int *)dst = color;
 }
 
-void	draw_column(t_ray *ray, int x, t_data *img)
+t_line	init_line(t_line *line, int X, t_ray *ray, t_tex tex)
 {
-	double	wallheight;
-	int		drawstart;
-	int		drawend;
-	int		y;
+	line->x = X;
+	line->y = -1;
+	line->wallheight = (double) WIN_H / ray->walldist;
+	line->drawstart = WIN_H / 2 - (int) line->wallheight / 2;
+	line->drawend = (int) line->wallheight / 2 + WIN_H / 2;
+	line->tex_x = (int) (ray->wall_x * (double) tex.width);
+	if (ray->horizontalwall == 0 && ray->raydirX < 0)
+		line->tex_x = tex.width - 1 - line->tex_x;
+	if (ray->horizontalwall == 1 && ray->raydirY > 0)
+		line->tex_x = tex.width - 1 - line->tex_x;
+	line->tex_y = 0;
+	return (*line);
+}
 
-	wallheight = (double) WIN_H / ray->walldist;
-	drawstart = WIN_H / 2 - (int) wallheight / 2;
-	if (drawstart < 0)
-		drawstart = 0;
-	drawend = (int) wallheight / 2 + WIN_H / 2;
-	if (drawend >= WIN_H)
-		drawend = WIN_H - 1;
-	y = -1;
-	while (y++ < drawstart)
-			my_mlx_pixel_put(img, x, y, 0x87CEEB);
-	while (y++ <= drawend)
-			my_mlx_pixel_put(img, x, y, 033500);
-	while (y++ < WIN_H)
-			my_mlx_pixel_put(img, x, y, 0x332421);
+void	draw_tex_line(t_tex tex, t_line *line, t_data *img)
+{
+	double	tex_step;
+	double	tex_pos;
+	int		color;
+	long	offset;
+
+	tex_step = 1.0 * tex.height / line->wallheight;
+	tex_pos = (line->drawstart - WIN_H / 2 + line->wallheight / 2) * tex_step;
+	line->y = line->drawstart;
+	while (line->y <= line->drawend)
+	{
+		line->tex_y = (int) tex_pos;
+		tex_pos += tex_step;
+		if (line->tex_y < 0)
+			line->tex_y = 0;
+		if (line->tex_y >= tex.height)
+			line->tex_y = tex.height - 1;
+		offset = (line->tex_y * tex.line_length) + (line->tex_x * (tex.bits_per_pixel / 8));
+		color = *(unsigned int *)(tex.addr + offset);
+		my_mlx_pixel_put(img, line->x, line->y, color);
+		line->y++;
+	}
+}
+void	draw_column(t_ray *ray, int x, t_data *img, t_tex tex)
+{
+	t_line line;
+
+	line = init_line(&line, x, ray, tex);
+	if (line.drawstart < 0)
+		line.drawstart = 0;
+	if (line.drawend >= WIN_H)
+		line.drawend = WIN_H - 1;
+	line.y = -1;
+	while (line.y++ < line.drawstart)
+		my_mlx_pixel_put(img, x, line.y, 0x87CEEB);
+	/*while (line.y++ <= line.drawend)*/
+	draw_tex_line(tex, &line, img);
+	while (line.y++ < WIN_H)
+		my_mlx_pixel_put(img, x, line.y, 0x332421);
 }
 
 void	render(t_game *game)
@@ -54,6 +89,6 @@ void	render(t_game *game)
 	{
 		ray = init_ray(game, i);
 		dda_analysis(game, &ray);
-		draw_column(&ray, i, &game->img);
+		draw_column(&ray, i, &game->img, game->wall_tex);
 	}
 }

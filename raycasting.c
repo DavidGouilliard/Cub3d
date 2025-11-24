@@ -27,6 +27,7 @@ void	initialize_ray(t_ray *ray)
 	ray->sidedistY = 0;
 	ray->cameraX = 0;
 	ray->walldist = 0;
+	ray->wall_x = 0;
 }
 
 void	ray_directions(t_game *game, t_ray *ray)
@@ -73,9 +74,16 @@ void	dda_analysis(t_game *game, t_ray *ray)
 			break;
 	}
 	if (ray->horizontalwall == 0)
+	{
         ray->walldist = (ray->mapX - game->player.x + (1 - ray->stepX) / 2) / ray->raydirX;
-    else
+		ray->wall_x = game->player.y + ray->walldist * ray->raydirY;
+	}
+	else
+	{
         ray->walldist = (ray->mapY - game->player.y + (1 - ray->stepY) / 2) / ray->raydirY;
+		ray->wall_x = game->player.x + ray->walldist * ray->raydirX;
+	}
+	ray->wall_x -= floor(ray->wall_x);
 }
 
 t_ray	init_ray(t_game *game, int x)
