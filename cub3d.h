@@ -1,0 +1,133 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cub3d.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dagouill <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/23 02:31:50 by dagouill          #+#    #+#             */
+/*   Updated: 2025/11/23 09:47:25 by dagouill         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef CUB3D_H
+
+#define CUB3D_H
+
+
+# include <X11/keysym.h>
+# include <fcntl.h>
+# include <math.h>
+# include "mlx/mlx.h"
+# include "stdlib.h"
+# include "sys/time.h"
+# include "libft/libft.h"
+# include "libft/get_next_line.h"
+
+# define WIN_W 800
+# define WIN_H 600
+# define FOV 0.66
+# define MOVE_SPEED 0.10
+# define ROT_SPEED 0.10
+
+typedef struct	s_data {
+	void	*img;
+	char	*addr;
+	int		bits_per_pixel;
+	int		line_length;
+	int		endian;
+}				t_data;
+
+typedef struct s_tex
+{
+    void    *img;
+    char    *addr;
+    int     width;
+    int     height;
+    int     bpp;
+    int     line_len;
+    int     endian;
+}   t_tex;
+
+typedef struct s_ray
+{
+	int		mapX;
+	int		mapY;
+	int		stepX;
+	int		stepY;
+	int		horizontalwall;
+	double	raydirX;
+	double	raydirY;
+	double	deltadistX;
+	double	deltadistY;
+	double	sidedistX;
+	double	sidedistY;
+	double	cameraX;
+	double	walldist;
+}	t_ray;
+
+typedef struct s_player
+{
+	double	x;
+	double	y;
+	double	dir_x;
+	double	dir_y;
+	double	plane_x;
+	double	plane_y;
+	double	move_speed;
+	double	cos_rot;
+	double	sin_rot;
+}	t_player;
+
+typedef struct s_game
+{
+	void		*mlx_ptr;
+	void		*win_ptr;
+	int			height;
+	int			lenght;
+	int			frames;
+	double		last_time;
+	double		fps;
+	t_list		*map_list;
+	t_data		img;
+	t_tex		wall_tex;
+	t_player	player;
+	char		**map;
+
+}	t_game;
+//Game loop
+int		on_keypress(int keycode, t_game *game);
+int		on_destroy(t_game *game);
+void	game_loop(t_game *game);
+void	free_game(t_game *game);
+//Init
+void	init_game_img(t_game *game);
+t_game	*initialize_struct(char *file);
+void	init_map(char *file, t_game *game);
+void	init_array(t_game *game);
+void	init_player(t_game *g);
+//Player move
+void	straight_move(int keycode, t_game *game);
+void	rotate_player(t_player *player, int direction);
+void	move_player(int keycode, t_game *game);
+void	set_player_dir(t_game *g, char C);
+char	get_player_pos(t_game *g);
+//Raycasting
+void	initialize_ray(t_ray *ray);
+void	ray_directions(t_game *game, t_ray *ray);
+void	dda_analysis(t_game *game, t_ray *ray);
+t_ray	init_ray(t_game *game, int x);
+//Rendering
+void	my_mlx_pixel_put(t_data *data, int x, int y, int color);
+void	draw_column(t_ray *ray, int x, t_data *img);
+void	render(t_game *game);
+//Utils
+void	error_exit(char *str, t_game *game);
+void	free_map(char **map);
+//Debug functions
+void	print_map(t_game *game);
+void	print_player(t_game *game);
+double	get_time(void);
+void	display_fps(t_game *game);
+void	update_fps(t_game *game);
+#endif
