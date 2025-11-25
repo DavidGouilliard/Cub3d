@@ -14,104 +14,39 @@ static bool	check_border_line(const char *line)
 	return (true);
 }
 
-static bool	get_content_start(const char *line, size_t *start)
+static bool	handle_cell(t_parser_state *st, size_t y, size_t x, size_t end)
 {
-	size_t	end;
+	char	c;
 
-	*start = 0;
-	while (line[*start] == ' ')
-		(*start)++;
-	end = ft_strlen(line);
-	while (end > *start && line[end - 1] == ' ')
-		end--;
-	if (*start == end || line[*start] != '1' || line[end - 1] != '1')
-		return (print_error("Carte non fermee sur les bords"), false);
-	return (true);
-}
-
-static char	safe_char(t_parser_state *st, size_t y, size_t x)
-{
-	size_t	len;
-	char	*line;
-
-	line = st->map_lines[y];
-	len = ft_strlen(line);
-	if (x >= len)
-		return (' ');
-	return (line[x]);
-}
-
-static bool	space_neighbors_ok(t_parser_state *st, size_t y, size_t x)
-{
-	char	up;
-	char	down;
-	char	left;
-	char	right;
-
-	up = safe_char(st, y - 1, x);
-	down = safe_char(st, y + 1, x);
-	if (x == 0)
-		left = ' ';
-	else
-		left = safe_char(st, y, x - 1);
-	right = safe_char(st, y, x + 1);
-	if ((up != '1' && up != ' ')
-		|| (down != '1' && down != ' ')
-		|| (left != '1' && left != ' ')
-		|| (right != '1' && right != ' '))
-		return (false);
-	return (true);
-}
-
-static bool	zero_neighbors_closed(t_parser_state *st, size_t y, size_t x)
-{
-	size_t	len_up;
-	size_t	len_down;
-	size_t	len_curr;
-
-	len_curr = ft_strlen(st->map_lines[y]);
-	len_up = ft_strlen(st->map_lines[y - 1]);
-	len_down = ft_strlen(st->map_lines[y + 1]);
-	if (x >= len_up || x >= len_down || x + 1 >= len_curr || x == 0)
-		return (false);
+	c = st->map_lines[y][x];
+	if (c == ' ')
+	{
+		if (!space_neighbors_ok(st, y, x, end))
+			return (false);
+	}
+	else if (c == '0')
+	{
+		if (!zero_position_ok(st, y, x, end))
+			return (print_error("Carte non fermee verticalement"), false);
+	}
+	else if (c != '1')
+		return (print_error("Caractere invalide dans la carte"), false);
 	return (true);
 }
 
 static bool	scan_row(t_parser_state *st, size_t y)
 {
-	size_t	len;
-	size_t	len_up;
-	size_t	len_down;
 	size_t	start;
+	size_t	end;
 	size_t	x;
 
-	len = ft_strlen(st->map_lines[y]);
-	len_up = ft_strlen(st->map_lines[y - 1]);
-	len_down = ft_strlen(st->map_lines[y + 1]);
-	if (!get_content_start(st->map_lines[y], &start))
+	if (!line_bounds_ok(st->map_lines[y], &start, &end))
 		return (false);
 	x = start;
-	while (x < len)
+	while (x < end)
 	{
-		if (st->map_lines[y][x] == ' ')
-		{
-			if (x >= start)
-			{
-				if (x >= len_up || x >= len_down)
-					return (print_error("Carte non fermee verticalement"), false);
-				if (!space_neighbors_ok(st, y, x))
-					return (print_error("Espace adjacent a vide"), false);
-			}
-		}
-		else if (st->map_lines[y][x] == '0')
-		{
-			if (x >= len_up || x >= len_down)
-				return (print_error("Carte non fermee verticalement"), false);
-			if (!zero_neighbors_closed(st, y, x))
-				return (print_error("Carte non fermee verticalement"), false);
-		}
-		else if (st->map_lines[y][x] != '1')
-			return (print_error("Caractere invalide dans la carte"), false);
+		if (!handle_cell(st, y, x, end))
+			return (false);
 		x++;
 	}
 	return (true);

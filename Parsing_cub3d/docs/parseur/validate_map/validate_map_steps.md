@@ -1,47 +1,37 @@
-# Résumé logique par fonction – validate_map.c
+# Résumé logique par fonction – validate_map (tolérance aux trailing spaces)
 
 Format “petit 1…” conforme à `doc.md`.
 
 ## validate_map
 Petit 1 : vérifier que `map_lines` existe, que `map_height > 0` et que `player_count == 1`.  
-Petit 2 : parcourir chaque ligne `y`.  
-Petit 3 : si `y` est la première ou la dernière ligne, chaque caractère doit être `'1'` ou espace (sinon erreur).  
-Petit 4 : pour les autres lignes, appliquer `scan_row`.  
-Petit 5 : si tout passe, retourner true, sinon afficher l’erreur et retourner false.  
-Scénario : une carte sans joueur unique ou sans ligne provoque une erreur immédiate ; une bordure contenant un `0` échoue au pas 3.
+Petit 2 : boucler sur chaque ligne `y`.  
+Petit 3 : si `y` est 0 ou `map_height-1`, refuser tout caractère autre que `'1'` ou espace.  
+Petit 4 : sinon appeler `scan_row`; si une règle casse, afficher l’erreur et retourner false.  
+Petit 5 : si toutes les lignes passent, retourner true.  
+Scénario : une bordure contenant un `0` ou l’absence de joueur unique échoue dès le début.
 
 ## scan_row
-Petit 1 : trouver le premier et le dernier caractère non-espace ; ils doivent être `'1'`.  
-Petit 2 : boucler sur les colonnes à partir du premier non-espace.  
-Petit 3 : pour chaque espace interne (hors espaces de tête), vérifier que les voisins N/E/S/O sont `1` ou espace (via `space_neighbors_ok`) et refuser si la colonne dépasse la ligne du haut ou du bas.  
-Petit 4 : pour chaque `'0'`, vérifier qu’il ne touche pas un débordement vertical (lignes du haut/bas suffisamment longues) et qu’il n’est pas collé aux bords gauche/droite via `zero_neighbors_closed`.  
-Petit 5 : si une règle casse, afficher l’erreur correspondante et retourner false.  
-Scénario : un espace touchant un caractère hors {1,' '} ou placé au-delà de la longueur d’une ligne voisine déclenche “Espace adjacent a vide” ou “Carte non fermee verticalement”; un `0` placé sur un bord ou au-delà de la longueur d’une ligne voisine déclenche “Carte non fermee verticalement”.
+Petit 1 : `line_bounds_ok` pour trouver `start/end` après trim des espaces de fin et exiger `'1'` au début/à la fin du contenu.  
+Petit 2 : boucler `x` de `start` à `end-1` et déléguer à `handle_cell`.  
+Petit 3 : `handle_cell` refuse un espace si un voisin N/E/S/O n’est pas dans `{ '1',' ' }` ou si la colonne `x` n’est pas encadrée par des murs au-dessus et au-dessous (via `wall_span_ok`).  
+Petit 4 : `handle_cell` refuse un `0` collé au bord gauche/droit ou si aucune paire de murs haut/bas n’encadre la colonne `x`.  
+Scénario : une ligne avec des espaces de fin est acceptée (non comptés), et un bloc décalé mais fermé par des `1` au-dessus/dessous passe ; une colonne sans mur haut/bas échoue “Carte non fermee verticalement”.
 
-## get_content_start
-Petit 1 : avancer `start` en sautant les espaces de tête.  
-Petit 2 : reculer `end` en sautant les espaces de fin.  
-Petit 3 : si la ligne est vide (`start == end`) ou si `line[start] != '1'` ou `line[end-1] != '1'`, retourner erreur “Carte non fermee sur les bords”.  
-Petit 4 : sinon, retourner vrai avec `*start` positionné sur le premier non-espace.  
-Scénario : `"  1 0010  "` passe (`start=2`), `"   0  "` échoue.
-
-## safe_char
-Petit 1 : calculer la longueur de la ligne `y`.  
-Petit 2 : si `x` dépasse cette longueur, retourner `' '`.  
-Petit 3 : sinon, retourner le caractère `line[y][x]`.  
-Scénario : sur une ligne courte, `safe_char(st, y, len+3)` renvoie `' '`.
+## line_bounds_ok
+Petit 1 : avancer `start` jusqu’au premier caractère non-espace.  
+Petit 2 : reculer `end` pour ignorer les espaces de fin.  
+Petit 3 : si la ligne est vide ou si `line[start]` ou `line[end-1]` ne valent pas `'1'`, afficher “Carte non fermee sur les bords” et retourner false.  
+Petit 4 : sinon, retourner true avec `start/end` prêts pour la boucle.  
+Scénario : `"11111   "` passe (`end` ignore les espaces), `"  0  "` échoue.
 
 ## space_neighbors_ok
-Petit 1 : lire `up` et `down` via `safe_char` aux positions `y-1, x` et `y+1, x`.  
-Petit 2 : lire `left` (si `x == 0`, forcer `' '`, sinon `safe_char(y, x-1)`).  
-Petit 3 : lire `right` via `safe_char(y, x+1)`.  
-Petit 4 : si l’un des voisins n’est pas dans `{ '1', ' ' }`, retourner false.  
-Petit 5 : sinon, retourner true.  
-Scénario : un espace adjacent à un caractère `2` déclenche false.
+Petit 1 : refuser si `x==0` ou `x+1>=end` (espace en bout de contenu).  
+Petit 2 : vérifier `wall_span_ok` sur les lignes haut/bas pour s’assurer qu’un mur existe à gauche et à droite autour de `x`.  
+Petit 3 : lire `up/down/left/right` (les indices hors longueur trimée valent `' '`) et refuser si un voisin n’appartient pas à `{ '1',' ' }`.  
+Scénario : un espace adjacent à un `0` ou dont la colonne n’est pas encadrée par des `1` sur les lignes du dessus/dessous déclenche “Carte non fermee verticalement” ou “Espace adjacent a vide”.
 
-## zero_neighbors_closed
-Petit 1 : récupérer les longueurs des lignes `y-1`, `y`, `y+1`.  
-Petit 2 : si `x` dépasse `len_up` ou `len_down`, retourner false.  
-Petit 3 : si `x == 0` ou si `x + 1 >= len_curr`, retourner false (bord gauche/droite).  
-Petit 4 : sinon, retourner true.  
-Scénario : un `0` sur la première colonne ou sous une ligne plus courte déclenche “Carte non fermee verticalement”.
+## zero_position_ok
+Petit 1 : refuser si `x==0` ou `x+1>=end` (bord gauche/droit).  
+Petit 2 : refuser si `wall_span_ok` échoue sur la ligne du haut ou du bas pour la colonne `x` (pas de mur à gauche/droite sur ces lignes).  
+Petit 3 : sinon true.  
+Scénario : un `0` placé en colonne finale ou sous une ligne qui n’a pas de `1` encadrant `x` échoue avec “Carte non fermee verticalement”.

@@ -124,29 +124,24 @@ Conforme à `doc.md` : organigrammes ASCII, hiérarchie Nivel 0/1/2, et document
 └───────────┬──────────────┘
             ▼
 ┌──────────────────────────┐
-│ trim espaces tête/fin    │
-│ → first/last doivent = 1 │
+│ line_bounds_ok (trim fin │
+│ + 1 aux extrémités)      │
 └──────────┬───────────────┘
            ▼
 ┌──────────────────────────┐
-│ len_top / len_bot        │
-└──────────┬───────────────┘
-           ▼
-┌──────────────────────────┐
-│ boucle x depuis first    │
+│ boucle x ∈ [start,end)   │
 └──────┬─────────┬─────────┘
-       │overflow │espace
+       │espace   │'0'
        ▼         ▼
-┌──────────────┐ ┌──────────────────────┐
-│ si dépasse   │ │ voisins ∈ {1,' '} ? │
-│ top/bot → '1'│ └──────┬───────────────┘
-└──────────────┘        ▼
-                        erreur ?
-                        │oui  │non
-                        ▼     ▼
-                    ┌────────┐ ┌────────┐
-                    │erreur  │ │continue│
-                    └────────┘ └────────┘
+┌────────────────────────┐ ┌────────────────┐
+│space_neighbors_ok      │ │ zero_position  │
+│(murs haut/bas via span)│ │    _ok         │
+└──────┬─────────────────┘ └───────┬────────┘
+       │ko                          │ko
+       ▼                            ▼
+   ┌────────┐                   ┌────────┐
+   │erreur  │                   │erreur  │
+   └────────┘                   └────────┘
 ```
 
 #### init_map_buffer / push_line (Niveau 2)
@@ -181,9 +176,9 @@ Conforme à `doc.md` : organigrammes ASCII, hiérarchie Nivel 0/1/2, et document
 - Ligne vide après début de carte marque la fin de la carte ; toute ligne non vide après cet arrêt déclenche une erreur.
 - `validate_map` vérifie :
   - lignes bord haut/bas uniquement `1` ou espace ;
-  - lignes internes : premier et dernier non-espace = `1` ;
-  - débordement par rapport aux longueurs haut/bas → caractères obligatoirement `1` ;
-  - espaces internes entourés uniquement de `1` ou d’espaces (voisins N/E/S/O).
+  - lignes internes : premier et dernier non-espace = `1` après trim des espaces de fin (trailing spaces tolérés) ;
+  - un `0` ne peut pas toucher les bords gauche/droit et doit avoir des murs en haut/bas de part et d’autre de sa colonne (wall span) ;
+  - espaces internes entourés uniquement de `1` ou d’espaces (voisins N/E/S/O), avec murs haut/bas autour de la colonne, et pas placés en bout de contenu.
 
 ## Prochaine étape
 - Étendre plus tard aux vérifications supplémentaires si nécessaire (ex: flood-fill pour cas extrêmes).

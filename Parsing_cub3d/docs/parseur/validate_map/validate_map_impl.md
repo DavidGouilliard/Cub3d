@@ -1,6 +1,6 @@
-# Validator Map – Implémentation
+# Validator Map – Implémentation (bords + espaces de fin tolérés)
 
-Conforme à `doc.md` : organigrammes ASCII, hiérarchie par niveaux, reflète le code de `src/parser/parse_map/validate_map.c`.
+Conforme à `doc.md` : organigrammes ASCII, hiérarchie par niveaux, reflète `src/parser/parse_map/validate_map.c` et `validate_map_utils.c`.
 
 ## Vue rapide des appels (Niveau 0)
 ```
@@ -9,8 +9,7 @@ Conforme à `doc.md` : organigrammes ASCII, hiérarchie par niveaux, reflète le
 └───────────┬──────────────┘
             ▼
 ┌──────────────────────────┐
-│ checks généraux (map,    │
-│ joueur unique)           │
+│ garde carte/joueur       │
 └───────────┬──────────────┘
             ▼
 ┌──────────────────────────┐
@@ -18,98 +17,150 @@ Conforme à `doc.md` : organigrammes ASCII, hiérarchie par niveaux, reflète le
 └──────┬─────────┬─────────┘
        │bord     │interne
        ▼         ▼
-┌──────────────┐ ┌──────────────────────┐
-│ check_bord   │ │ scan_row             │
-└──────┬───────┘ └──────────┬───────────┘
-       │ko                 │ko
-       ▼                   ▼
-   ┌────────┐          ┌────────┐
-   │erreur  │          │erreur  │
-   └────────┘          └────────┘
+┌──────────────┐ ┌────────────────┐
+│ check_border │ │   scan_row     │
+└──────────────┘ └────────────────┘
 ```
 
-## Sous-graphes par fonction (Niveau 1)
-
-### validate_map
+## validate_map (Niveau 1)
 ```
 ┌──────────────────────────┐
 │ validate_map(state)      │
 └───────────┬──────────────┘
             ▼
 ┌──────────────────────────┐
-│ map_lines existe ?       │
-│ map_height > 0 ?         │
+│ map_lines && height ?    │
 │ player_count == 1 ?      │
-└───────────┬──────────────┘
+└──────────┬──────────────┘
             ▼
 ┌──────────────────────────┐
-│ boucle y = 0..height-1  │
+│ for y in [0..height-1]   │
 └──────┬─────────┬─────────┘
        │bord     │interne
        ▼         ▼
 ┌──────────────┐ ┌────────────────┐
-│ check_bord   │ │ scan_row(y)    │
-└──────────────┘ └──────┬─────────┘
-                        ▼
-                  erreur ? → stop
+│ check_border │ │   scan_row     │
+└──────┬───────┘ └───────┬────────┘
+       │ko               │ko
+       ▼                 ▼
+   ┌────────┐        ┌────────┐
+   │erreur  │        │erreur  │
+   └────────┘        └────────┘
 ```
 
-### check_border_line (lignes 0 et dernière)
+## scan_row (Niveau 1)
 ```
 ┌──────────────────────────┐
-│ check_border_line(line)  │
+│ scan_row(st, y)          │
 └───────────┬──────────────┘
             ▼
 ┌──────────────────────────┐
-│ chaque char ∈ {1, ' '} ? │
+│ line_bounds_ok           │ // trim espaces fin, 1 aux extrémités
+└──────┬─────────┬─────────┘
+       │ko       │ok
+       ▼         ▼
+   ┌────────┐ ┌────────────────┐
+   │erreur  │ │ len_up/len_down│
+   └────────┘ └──────────┬─────┘
+                         ▼
+┌──────────────────────────┐
+│ boucle x ∈ [start,end)   │
+└──────┬─────────┬─────────┘
+       │espace   │'0'/'1'
+       ▼         ▼
+┌────────────────┐ ┌────────────────┐
+│space_neighbors │ │ zero_position  │
+│   _ok          │ │    _ok         │
+└──────┬─────────┘ └───────┬────────┘
+       │ko                 │ko
+       ▼                   ▼
+   ┌────────┐          ┌────────┐
+   │erreur  │          │erreur  │
+   └────────┘          └────────┘
+```
+Objectif : ne considérer que le contenu utile (après trim des espaces de fin) et refuser tout trou vertical ou voisinage non muré.
+
+## Helpers (Niveau 2)
+
+### line_bounds_ok
+```
+┌──────────────────────────┐
+│ line_bounds_ok(line)     │
+└───────────┬──────────────┘
+            ▼
+┌──────────────────────────┐
+│ start = 1er non-espace   │
+│ end   = len trim         │
+└──────────┬──────────────┘
+            ▼
+┌──────────────────────────┐
+│ line[start] == '1' ?     │
+│ line[end-1] == '1' ?     │
 └──────┬─────────┬─────────┘
        │non      │oui
        ▼         ▼
    ┌────────┐ ┌────────┐
-   │erreur  │ │ OK     │
+   │erreur  │ │ success│
    └────────┘ └────────┘
 ```
 
-### scan_row (lignes internes)
+### wall_span_ok
 ```
 ┌──────────────────────────┐
-│ scan_row(state, y)       │
+│ wall_span_ok(line, x)    │
 └───────────┬──────────────┘
             ▼
 ┌──────────────────────────┐
-│ get_content_start        │
-│ (trim tête/fin)          │
-└──────────┬───────────────┘
-           ▼
-┌──────────────────────────┐
-│ first/last non-espace=1?│
-└──────────┬───────────────┘
-           ▼
-┌──────────────────────────┐
-│ boucle x depuis start    │
+│ chercher '1' à gauche    │
+│ et à droite de x         │
 └──────┬─────────┬─────────┘
-       │espace   │'0'
+       │manque   │ok
        ▼         ▼
-┌─────────────────────────────────┐ ┌──────────────────────────┐
-│ voisins ∈ {1,' '} ? et pas de   │ │ bords/debordement ?      │
-│ debordement vertical ?          │ └──────┬───────────────────┘
-└──────┬──────────────────┬───────┘        │
-       │oui               │non             ▼
-       ▼                  ▼             continue
-   continue            erreur                │
-       │                                   ┌──┘
-       └──────┐                            ▼
-              ▼                        erreur
+   ┌────────┐ ┌────────┐
+   │ false  │ │  true  │
+   └────────┘ └────────┘
+```
+Objectif : valider qu’une colonne est encadrée par des murs sur la ligne même si sa longueur trimée est plus courte que `x`.
+
+### space_neighbors_ok
+```
+┌──────────────────────────┐
+│ space_neighbors_ok(...)  │
+└───────────┬──────────────┘
+            ▼
+┌──────────────────────────┐
+│ x>0 et x+1<end ?         │
+│ murs haut/bas (wall_span)│
+│ up/down/left/right ∈     │
+│ {'1',' '} ?              │
+└──────┬─────────┬─────────┘
+       │non      │oui
+       ▼         ▼
+   ┌────────┐ ┌────────┐
+   │erreur  │ │ success│
+   └────────┘ └────────┘
 ```
 
-#### Helpers (Niveau 2)
-- `get_content_start` : saute les espaces de tête et de fin, exige que les premiers/derniers non-espaces soient `'1'`.
-- `safe_char` : retourne `' '` si la colonne dépasse la longueur de la ligne sollicitée.
-- `space_neighbors_ok` : vérifie que les voisins N/E/S/O d’un espace sont uniquement `1` ou espace (utilise `safe_char`).
+### zero_position_ok
+```
+┌──────────────────────────┐
+│ zero_position_ok(...)    │
+└──────────┬──────────────┘
+            ▼
+┌──────────────────────────┐
+│ x>0 && x+1<end ?         │
+│ murs haut/bas (wall_span)│
+└──────┬─────────┬─────────┘
+       │non      │oui
+       ▼         ▼
+   ┌────────┐ ┌────────┐
+   │erreur  │ │ success│
+   └────────┘ └────────┘
+```
 
 ## Règles codées
-- Carte présente et joueur unique requis (sinon erreur).
-- Ligne 0 et dernière : uniquement `1` ou espaces.
-- Lignes intermédiaires : premier et dernier non-espace doivent être `1`.
-- Espaces internes (après les espaces de tête) : voisins N/E/S/O limités à `1` ou espace, et aucun débordement vertical n’est toléré (sinon mur attendu).
-- Cases `'0'` ne doivent pas toucher un débordement : la ligne du haut ou du bas doit être suffisamment longue, et la case ne peut pas être en bord immédiat gauche/droite.
+- La carte doit exister et avoir un joueur unique.
+- Lignes 0 et dernière : uniquement `'1'` ou espaces.
+- Lignes internes : premier/dernier non-espace = `'1'`, calculés après trim des espaces de fin (tolérance aux trailing spaces).
+- Un `0` ne peut pas toucher le bord gauche/droit et doit être encadré par des murs au-dessus et au-dessous (recherche de `1` à gauche et à droite sur les lignes voisines).
+- Un espace interne doit être entouré de `{ '1',' ' }` (haut, bas, gauche, droite), disposer de murs haut/bas autour de sa colonne, et ne peut pas se trouver sur un bord de contenu.

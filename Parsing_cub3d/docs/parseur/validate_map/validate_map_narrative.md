@@ -1,76 +1,52 @@
 # Revue de Conception Narrative – validate_map.c
 
 ## 1. But du module
-- Assurer que la carte déjà lue par `parse_map` est fermée : pas de trous aux bords, pas de débordements ouverts, espaces correctement encadrés.
-- Ne modifie pas la carte : renvoie `true/false` et imprime une erreur via `print_error` en cas de violation.
-- Renforce l’invariant “un seul joueur” avant d’aller plus loin dans l’exécution.
+- Vérifier que la carte collectée par `parse_map` est fermée, en autorisant les espaces de fin de ligne (trailing spaces) mais en refusant toute fuite verticale ou latérale.
+- Ne modifie pas la carte : uniquement des lectures et des messages d’erreur via `print_error`.
+- Double-check “un seul joueur” avant toute validation de géométrie.
 
 ## 2. Structures importantes
-- `t_parser_state` : on lit `map_lines`, `map_height`, et `player_count`. Aucune écriture, uniquement des checks.
-- Les helpers internes (`get_content_start`, `safe_char`, `space_neighbors_ok`) travaillent à partir des chaînes stockées dans `map_lines`.
+- `t_parser_state` : lecture seule de `map_lines`, `map_height`, `map_width` (indirect via `trimmed_len`) et `player_count`.
+- Helpers utilitaires :
+  - `trimmed_len` calcule la longueur sans les espaces de fin, ce qui permet d’accepter des lignes avec padding.
+  - `wall_span_ok` repère, pour une colonne donnée, s’il existe un `1` à gauche et à droite sur la même ligne (utilisé pour tolérer des blocs décalés).
 
 ## 3. Fonctions principales
 ### 3.1 validate_map(t_parser_state *state)
-- **Objectif** : orchestrer les contrôles de fermeture sur toutes les lignes.
+- **Objectif** : orchestrer les contrôles de fermeture.
 - **Stratégie** :
-  - Rejette immédiatement si la carte est absente ou si `player_count != 1`.
-  - Parcourt chaque ligne : bord haut/bas via `check_border_line`, lignes internes via `scan_row`.
-  - S’arrête au premier échec (retour false).
-- **Ce que ça modifie** : rien ; lecture seule sur `state`.
-- **Exemple** : une première ligne contenant un `0` fait échouer `check_border_line`.
+  - Rejette si carte absente ou joueur ≠ 1.
+  - Parcourt toutes les lignes : bords haut/bas via `check_border_line`, lignes internes via `scan_row`.
+  - Stoppe au premier échec en renvoyant `false`.
+- **Ce que ça modifie** : rien.
+- **Exemple** : une première ligne contenant un `0` déclenche “Carte ouverte sur le bord”.
 
 ### 3.2 check_border_line(const char *line)
-- **Objectif** : garantir des bords supérieurs/inférieurs constitués uniquement de `1` ou d’espaces.
-- **Stratégie** : boucle sur la ligne ; tout caractère hors `{1, ' '}` déclenche une erreur “Carte ouverte sur le bord”.
-- **Ce que ça modifie** : rien.
-- **Exemple** : `"11 110"` est accepté, `"11 10"` échoue.
+- **Objectif** : garantir que la première et la dernière ligne ne contiennent que des `1` ou des espaces.
+- **Stratégie** : boucle sur chaque caractère ; tout autre symbole → erreur.
+- **Exemple** : `"11111   "` passe, `"1111 0"` échoue.
 
 ### 3.3 scan_row(t_parser_state *st, size_t y)
-- **Objectif** : vérifier une ligne interne : bords latéraux fermés, débordements murés, espaces entourés.
+- **Objectif** : valider une ligne interne en ignorant les espaces de fin.
 - **Stratégie** :
-  - `get_content_start` trouve le premier/dernier non-espace et impose `'1'`.
-  - Pour chaque espace non-leading, `space_neighbors_ok` contrôle que N/E/S/O sont `1` ou espace et refuse un débordement vertical (colonne au-delà de la ligne du haut ou du bas).
-  - Pour chaque `0`, on refuse tout débordement vertical et `zero_neighbors_closed` garantit qu’il n’est pas collé aux bords gauche/droite.
-- **Ce que ça modifie** : rien.
-- **Exemple** : un `0` placé sur la première colonne ou au-delà de la longueur de la ligne du haut échoue avec “Carte non fermee verticalement”.
-
-### 3.4 Helpers internes (objectif / stratégie / modifs / exemple)
-- **get_content_start(const char *line, size_t *start)**
-  - Objectif : trouver le premier et le dernier non-espace d’une ligne interne et imposer qu’ils valent `'1'`.
-  - Stratégie : avance `start` en sautant les espaces de tête, recule `end` en sautant ceux de fin ; si vide ou extrémités ≠ `1`, erreur “Carte non fermee sur les bords”.
-  - Modifie : écrit dans `*start` uniquement.
-  - Exemple : `"  1 0010  "` → `start=2`, `end=9`, OK ; `"   0  "` → échec.
-- **safe_char(t_parser_state *st, size_t y, size_t x)**
-  - Objectif : lire un voisin potentiel sans risque de dépassement.
-  - Stratégie : si `x` dépasse `len(line[y])`, retourne `' '`, sinon retourne le caractère demandé.
-  - Modifie : rien.
-  - Exemple : sur une ligne plus courte, `safe_char(st, y, len+3)` renvoie `' '`.
-- **space_neighbors_ok(t_parser_state *st, size_t y, size_t x)**
-  - Objectif : valider les voisins immédiats N/E/S/O d’un espace interne.
-  - Stratégie : récupère `up/down/left/right` via `safe_char` (gauche forcée à `' '` si `x == 0`), exige que chaque voisin ∈ `{1, ' '}`.
-  - Modifie : rien.
-  - Exemple : un espace jouxtant un caractère `2` ferait échouer le check.
-- **zero_neighbors_closed(t_parser_state *st, size_t y, size_t x)**
-  - Objectif : refuser un `0` posé sur un débordement vertical ou collé aux bords latéraux.
-  - Stratégie : calcule les longueurs des lignes `y-1`, `y`, `y+1`; échoue si `x` dépasse len_up ou len_down, ou si `x` est 0 ou si `x+1` dépasse la ligne courante.
-  - Modifie : rien.
-  - Exemple : un `0` en bord gauche (`x == 0`) ou sous une ligne plus courte est rejeté (“Carte non fermee verticalement”).
+  - `line_bounds_ok` trim les espaces de fin, impose `'1'` comme premier et dernier caractère utile, et renvoie `start/end`.
+  - Parcourt `x` de `start` à `end-1` et délègue à `handle_cell`.
+  - `handle_cell` refuse un espace si la colonne `x` n’est pas encadrée par des murs sur les lignes haut/bas (`wall_span_ok`) ou si un voisin N/E/S/O sort de `{1,' '}`. Refuse un `0` collé aux bords gauche/droit ou sans murs haut/bas autour de `x`.
+- **Exemple** : une ligne avec des espaces finaux est acceptée, et un bloc décalé mais fermé par des `1` au-dessus/dessous passe ; une colonne sans mur haut/bas échoue “Carte non fermee verticalement”.
 
 ## 4. Guide de lecture du code
-1. Lire `validate_map` pour l’orchestration (checks globaux puis boucle lignes).
-2. Voir `check_border_line` pour comprendre le contrôle des bords haut/bas.
-3. Parcourir `scan_row` : ordre des tests (bords latéraux, débordements, espaces internes).
-4. Noter que `safe_char` renvoie `' '` si on sort de la ligne, évitant toute lecture hors borne.
+1. Lire `validate_map` pour l’orchestration et les gardes initiales.
+2. Voir `check_border_line` pour comprendre les exigences des bords haut/bas.
+3. Parcourir `scan_row` et `handle_cell` pour suivre l’ordre des contrôles (trim, murs haut/bas via `wall_span_ok`, voisinage).
+4. Observer `trimmed_len`/`wall_span_ok` dans `validate_map_utils.c` pour voir comment on tolère des blocs décalés tout en recherchant des murs.
 
 ## 5. Check-list de compréhension
-- Je sais ce qui déclenche une erreur immédiate (carte absente, joueur absent/multiple).
-- Je peux expliquer pourquoi les bords haut/bas sont limités à `{1, ' '}`.
-- Je sais que pour un espace interne, tous les voisins N/E/S/O doivent être `1` ou espace.
-- Je sais que pour un `0`, il ne doit pas toucher un débordement (pas au bord, lignes voisines assez longues).
-- Je sais que `validate_map` ne modifie rien et se contente de valider.
+- Je sais que les espaces de fin de ligne sont tolérés (trim) mais qu’un espace interne doit être entouré de murs/espaces et encadré par des murs haut/bas à sa colonne.
+- Je sais qu’un `0` doit être encadré à gauche/droite et reposer sur des lignes haut/bas qui ont des murs de part et d’autre de cette colonne.
+- Je sais que les bords haut/bas acceptent seulement `1` ou espace.
+- Je sais que `validate_map` ne modifie rien et s’arrête dès la première anomalie.
 
 ## Pièges / invariants importants
-- `player_count` doit déjà valoir 1 (double-check ici).
-- Une ligne faite uniquement d’espaces échoue car `get_content_start` impose des `1` en extrémités non-espaces.
-- Les espaces de tête ne sont pas inspectés pour les voisins ; seuls les espaces après `get_content_start` sont soumis au voisinage (et tolèrent uniquement `1`/espace).
-- Les `0` placés en bord ou dépassant la longueur d’une ligne voisine échouent via “Carte non fermee verticalement”.
+- `player_count` doit valoir 1 avant la validation.
+- Une ligne vide ou composée uniquement d’espaces échoue car `line_bounds_ok` impose des `'1'` en début/fin de contenu.
+- Les checks utilisent des longueurs “trim” : un débordement vertical se calcule sur le contenu réel, pas sur les espaces de padding, mais on accepte un bloc décalé si des murs encadrent la colonne (via `wall_span_ok`).  
