@@ -12,31 +12,45 @@
 
 #include "cub3d.h"
 
+void	move_up(double new_x, double new_y, t_game *game)
+{
+		new_x = game->player.x + game->player.dir_x * game->player.move_speed;
+		new_y = game->player.y + game->player.dir_y * game->player.move_speed;
+		if (new_x < 0)
+			new_x = 0.0001;
+		if (new_y < 0)
+			new_y = 0.0001;
+		if (game->map[(int)new_y][(int)new_x] == '0')
+		{
+			game->player.x = new_x;
+			game->player.y = new_y;
+		}
+}
+void	move_down(double new_x, double new_y, t_game *game)
+{
+		new_x = game->player.x - game->player.dir_x * game->player.move_speed;
+		new_y = game->player.y - game->player.dir_y * game->player.move_speed;
+		if (new_x < 0)
+			new_x = 0.0001;
+		if (new_y < 0)
+			new_y = 0.0001;
+		if (game->map[(int)new_y][(int)new_x] == '0')
+		{
+			game->player.x = new_x;
+			game->player.y = new_y;
+		}
+}
 void	straight_move(int keycode, t_game *game)
 {
 	double new_x;
 	double new_y;
 
+	new_x = 0.0;
+	new_y = 0.0;
 	if (keycode == XK_w)
-	{
-		new_x = game->player.x + game->player.dir_x * game->player.move_speed;
-		new_y = game->player.y + game->player.dir_y * game->player.move_speed;
-		if (game->map[(int)new_y][(int)new_x] == '0')
-		{
-			game->player.x = new_x;
-			game->player.y = new_y;
-		}
-	}
+		move_up(new_x, new_y, game);
 	else if (keycode == XK_s)
-	{
-		new_x = game->player.x - game->player.dir_x * game->player.move_speed;
-		new_y = game->player.y - game->player.dir_y * game->player.move_speed;
-		if (game->map[(int)new_y][(int)new_x] == '0')
-		{
-			game->player.x = new_x;
-			game->player.y = new_y;
-		}
-	}
+		move_down(new_x, new_y, game);
 }
 
 void	rotate_player(t_player *player, int direction)
