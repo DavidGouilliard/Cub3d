@@ -101,16 +101,16 @@ typedef struct s_game
 {
 	void		*mlx_ptr;
 	void		*win_ptr;
-	int			height;
-	int			lenght;
 	int			frames;
 	double		last_time;
 	double		fps;
 	t_list		*map_list;
 	t_data		img;
-	t_tex		wall_tex;
+	t_tex		wall_tex[TEX_TOTAL];
 	t_player	player;
+	char		*tex_path[TEX_TOTAL];
 	char		**map;
+	int			colors[2];
 
 }	t_game;
 //Game loop
@@ -120,10 +120,10 @@ void	game_loop(t_game *game);
 void	free_game(t_game *game);
 //Init
 void	init_game_img(t_game *game);
-t_game	*initialize_struct(char *file);
+t_game	*init_game(t_parser_state state);
 void	init_map(char *file, t_game *game);
 void	init_array(t_game *game);
-void	init_player(t_game *g);
+void	init_player(t_game *g, t_parser_state state);
 //Player move
 void	straight_move(int keycode, t_game *game);
 void	rotate_player(t_player *player, int direction);
@@ -143,8 +143,8 @@ void	render(t_game *game);
 void	error_exit(char *str, t_game *game);
 void	free_map(char **map);
 //Debug functions
-void	print_map(t_game *game);
-void	print_player(t_game *game);
+/*void	print_map(t_game *game);*/
+/*void	print_player(t_game *game);*/
 double	get_time(void);
 void	display_fps(t_game *game);
 void	update_fps(t_game *game);

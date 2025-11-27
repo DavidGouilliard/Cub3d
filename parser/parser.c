@@ -41,7 +41,7 @@ static void	destroy_state(t_parser_state *state)
 	free(state->map_lines);
 }
 
-int	parse(const char *path)
+int	parse(const char *path, t_game **game)
 {
 	t_parser_state	state;
 	char			*first_map_line;
@@ -61,9 +61,9 @@ int	parse(const char *path)
 	if (ok)
 		ok = validate_map(&state);
 	close(fd);
-	destroy_state(&state);
 	if (!ok)
-		return (1);
+		return (destroy_state(&state),1);
+	*game = init_game(state);
 	return (0);
 }
 

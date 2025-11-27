@@ -14,16 +14,24 @@
 
 void	free_game(t_game *game)
 {
+	int	i;
+
+	i = 0;
 	if (!game)
 		return ;
 	free_map(game->map);
-	ft_lstclear(&(game->map_list), free);
+	/*ft_lstclear(&(game->map_list), free);*/
 	if (game->win_ptr)
 		mlx_destroy_window(game->mlx_ptr, game->win_ptr);
 	if (game->img.img)
 		mlx_destroy_image(game->mlx_ptr, game->img.img);
-	if (game->wall_tex.img)
-		mlx_destroy_image(game->mlx_ptr, game->wall_tex.img);
+	while (i < TEX_TOTAL)
+	{
+		if (game->tex_path[i])
+			free(game->tex_path[i]);
+		if (game->wall_tex[i].img)
+			mlx_destroy_image(game->mlx_ptr, game->wall_tex[i++].img);
+	}
 	mlx_destroy_display(game->mlx_ptr);
 	free(game->mlx_ptr);
 	free(game);

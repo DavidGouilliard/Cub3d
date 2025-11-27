@@ -21,12 +21,11 @@ int	main(int ac, char **av)
 		error_exit("wrong argument count\n", game);
 	if (!is_cub_file(av[1]))
 		error_exit("Le fichier doit se terminer par .cub\n", game);
-	if (parse(av[1]) != 0)
-		return (1);
-	game = initialize_struct(av[1]);
+	if (parse(av[1], &game) != 0)
+		error_exit("", game);
 	/*print_map(game);*/
-	print_player(game);
-	game->win_ptr = mlx_new_window(game->mlx_ptr, WIN_W, WIN_H, "Cube3d");
+	/*print_player(game);*/
+	game->win_ptr = mlx_new_window(game->mlx_ptr, WIN_W, WIN_H, "cube3d");
 	if (!game->win_ptr)
 		error_exit("win_ptr failed\n", game);
 	init_game_img(game);

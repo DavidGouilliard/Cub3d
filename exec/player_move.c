@@ -109,30 +109,30 @@ void	set_player_dir(t_game *g, char C)
 	}
 }
 
-char	get_player_pos(t_game *g)
-{
-	int		y;
-	int		x;
-	char	c;
-
-	y = 0;
-	c = 0;
-	while (y < g->height)
-	{
-		x = 0;
-		while (g->map[y][x])
-		{
-			c = g->map[y][x];
-			if (c == 'N' || c == 'S' || c == 'E' || c == 'W')
-			{
-				g->player.x = (double)x + 0.5;
-				g->player.y = (double)y + 0.5;
-				g->map[y][x] = '0';
-				return (c);
-			}
-			x++;
-		}
-		y++;
-	}
-	return (c);
-}
+/*char	get_player_pos(t_game *g)*/
+/*{*/
+/*	int		y;*/
+/*	int		x;*/
+/*	char	c;*/
+/**/
+/*	y = 0;*/
+/*	c = 0;*/
+/*	while (y < g->height)*/
+/*	{*/
+/*		x = 0;*/
+/*		while (g->map[y][x])*/
+/*		{*/
+/*			c = g->map[y][x];*/
+/*			if (c == 'N' || c == 'S' || c == 'E' || c == 'W')*/
+/*			{*/
+/*				g->player.x = (double)x + 0.5;*/
+/*				g->player.y = (double)y + 0.5;*/
+/*				g->map[y][x] = '0';*/
+/*				return (c);*/
+/*			}*/
+/*			x++;*/
+/*		}*/
+/*		y++;*/
+/*	}*/
+/*	return (c);*/
+/*}*/

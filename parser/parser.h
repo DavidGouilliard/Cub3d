@@ -16,10 +16,12 @@
 # include <stdbool.h>
 # include <unistd.h>
 # include <fcntl.h>
-
+# include "cub3d.h"
 #ifndef BUFFER_SIZE
 #define BUFFER_SIZE 1024
 #endif
+
+typedef struct s_game t_game;
 
 typedef enum e_texture
 {
@@ -52,7 +54,7 @@ typedef struct s_parser_state
 	char	player_dir;
 }	t_parser_state;
 
-int		parse(const char *path);
+int		parse(const char *path, t_game **game);
 bool	is_cub_file(const char *path);
 bool	parse_header(int fd, t_parser_state *state, char **first_map_line);
 bool	parse_map(int fd, t_parser_state *state, char *first_map_line);

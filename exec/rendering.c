@@ -77,10 +77,29 @@ void	draw_column(t_ray *ray, int x, t_data *img, t_tex tex)
 		my_mlx_pixel_put(img, x, line.y, 0x332421);
 }
 
+int	get_wall_direction(t_ray ray)
+{
+	 if (ray.horizontalwall == 0)
+	 {
+	 		if(ray.raydirX > 0)
+	 			return (TEX_WE);
+	 		else
+	 			return (TEX_EA);
+	}
+	else
+	{
+		if (ray.raydirY > 0)
+	 			return (TEX_NO);
+	 		else
+	 			return (TEX_SO);
+	}
+}
+
 void	render(t_game *game)
 {
 	t_ray	ray;
 	int		i;
+	int		direction;
 
 	i = -1;
 	initialize_ray(&ray);
@@ -88,6 +107,7 @@ void	render(t_game *game)
 	{
 		ray = init_ray(game, i);
 		dda_analysis(game, &ray);
-		draw_column(&ray, i, &game->img, game->wall_tex);
+		direction = get_wall_direction(ray);
+		draw_column(&ray, i, &game->img, game->wall_tex[direction]);
 	}
 }

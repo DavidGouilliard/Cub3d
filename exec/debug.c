@@ -12,37 +12,37 @@
 
 #include "../cub3d.h"
 
-void	print_map(t_game *game)
-{
-	int	y;
-	int	x;
-
-	ft_putstr_fd("Map state:\n", 1);
-	for (y = 0; y < game->height; y++)
-	{
-		x = 0;
-		while (game->map[y][x])
-		{
-			write(1, &game->map[y][x], 1);
-			x++;
-		}
-		write(1, "\n", 1);
-	}
-}
-
-void	print_player(t_game *game)
-{
-	ft_putstr_fd("Player position: ", 1);
-	ft_putnbr_fd((int)game->player.x, 1);
-	write(1, ", ", 2);
-	ft_putnbr_fd((int)game->player.y, 1);
-	write(1, "\n", 1);
-	ft_putstr_fd("Player direction: ", 1);
-	ft_putnbr_fd((int)(game->player.dir_x * 100), 1);
-	write(1, ", ", 2);
-	ft_putnbr_fd((int)(game->player.dir_y * 100), 1);
-	write(1, "\n", 1);
-}
+/*void	print_map(t_game *game)*/
+/*{*/
+/*	int	y;*/
+/*	int	x;*/
+/**/
+/*	ft_putstr_fd("Map state:\n", 1);*/
+/*	for (y = 0; y < game->height; y++)*/
+/*	{*/
+/*		x = 0;*/
+/*		while (game->map[y][x])*/
+/*		{*/
+/*			write(1, &game->map[y][x], 1);*/
+/*			x++;*/
+/*		}*/
+/*		write(1, "\n", 1);*/
+/*	}*/
+/*}*/
+/**/
+/*void	print_player(t_game *game)*/
+/*{*/
+/*	ft_putstr_fd("Player position: ", 1);*/
+/*	ft_putnbr_fd((int)game->player.x, 1);*/
+/*	write(1, ", ", 2);*/
+/*	ft_putnbr_fd((int)game->player.y, 1);*/
+/*	write(1, "\n", 1);*/
+/*	ft_putstr_fd("Player direction: ", 1);*/
+/*	ft_putnbr_fd((int)(game->player.dir_x * 100), 1);*/
+/*	write(1, ", ", 2);*/
+/*	ft_putnbr_fd((int)(game->player.dir_y * 100), 1);*/
+/*	write(1, "\n", 1);*/
+/*}*/
 
 double	get_time(void)
 {
