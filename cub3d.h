@@ -23,6 +23,9 @@
 # include "sys/time.h"
 # include "libft/libft.h"
 # include "libft/get_next_line.h"
+# include "parser/parser.h"
+# include "parser/parse_header/parse_header_internal.h"
+# include "parser/parse_map/parse_map_internal.h"
 
 # define WIN_W 800
 # define WIN_H 600

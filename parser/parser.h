@@ -1,0 +1,64 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing.h                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: othmaneettaqi <othmaneettaqi@student.42    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/17 11:40:59 by othmaneetta       #+#    #+#             */
+/*   Updated: 2025/11/27 05:36:27 by dagouill         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef PARSING_H
+# define PARSING_H
+
+# include <stdbool.h>
+# include <unistd.h>
+# include <fcntl.h>
+
+#ifndef BUFFER_SIZE
+#define BUFFER_SIZE 1024
+#endif
+
+typedef enum e_texture
+{
+	TEX_NO = 0,
+	TEX_SO,
+	TEX_WE,
+	TEX_EA,
+	TEX_TOTAL
+}	t_texture;
+
+typedef struct s_color
+{
+	int		r;
+	int		g;
+	int		b;
+	bool	set;
+}	t_color;
+
+typedef struct s_parser_state
+{
+	char	*tex_path[TEX_TOTAL];
+	t_color	floor;
+	t_color	ceiling;
+	char	**map_lines;
+	size_t	map_width;
+	size_t	map_height;
+	int		player_count;
+	int		player_x;
+	int		player_y;
+	char	player_dir;
+}	t_parser_state;
+
+int		parse(const char *path);
+bool	is_cub_file(const char *path);
+bool	parse_header(int fd, t_parser_state *state, char **first_map_line);
+bool	parse_map(int fd, t_parser_state *state, char *first_map_line);
+bool	validate_map(t_parser_state *state);
+void	ft_free_split(char **tab);
+bool	ft_isspace(char c);
+void	print_error(const char *msg);
+
+#endif
