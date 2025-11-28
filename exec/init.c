@@ -44,6 +44,16 @@ void load_textures(t_game *game)
 	}
 }
 
+void	init_keys(t_game *game)
+{
+		game->keys.up = 0;
+		game->keys.down = 0;
+		game->keys.left = 0;
+		game->keys.right = 0;
+		game->keys.r_left = 0;
+		game->keys.r_right = 0;
+}
+
 t_game	*init_game(t_parser_state state)
 {
 	t_game	*game;
@@ -54,13 +64,16 @@ t_game	*init_game(t_parser_state state)
 	if (!game)
 		return (NULL);
 	game->map = NULL;
+	init_keys(game);
 	game->mlx_ptr = mlx_init();
 	if (!game->mlx_ptr)
 		error_exit("error mlx ptr\n", game);
 	game->win_ptr = NULL;
 	game->frames = 0;
 	game->fps = 0;
-	game->last_time = get_time();
+	game->current_time = get_time();
+	game->last_time = game->current_time;
+	game->fps_last_time = game->current_time;
 	game->map = state.map_lines;
 	game->map_height = state.map_height;
 	game->colors[0] = (state.ceiling.r << 16) + (state.ceiling.g << 8) + state.ceiling.b;

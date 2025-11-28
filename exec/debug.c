@@ -77,10 +77,10 @@ void	update_fps(t_game *game)
 
 	current_time = get_time();
 	game->frames++;
-	if (current_time - game->last_time >= 1.0)
+	if (current_time - game->fps_last_time >= 1.0)
 	{
-		game->fps = game->frames / (current_time - game->last_time);
+		game->fps = game->frames / (current_time - game->fps_last_time);
 		game->frames = 0;
-		game->last_time = current_time;
+		game->fps_last_time = current_time;
 	}
 }

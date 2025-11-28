@@ -26,6 +26,7 @@ void	move_up(double new_x, double new_y, t_game *game)
 			game->player.y = new_y;
 		}
 }
+
 void	move_down(double new_x, double new_y, t_game *game)
 {
 		new_x = game->player.x - game->player.dir_x * game->player.move_speed;

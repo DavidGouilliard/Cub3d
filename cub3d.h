@@ -27,11 +27,12 @@
 # include "parser/parse_header/parse_header_internal.h"
 # include "parser/parse_map/parse_map_internal.h"
 
-# define WIN_W 800
-# define WIN_H 600
+# define WIN_W 1920
+# define WIN_H 1080
 # define FOV 0.66
-# define MOVE_SPEED 0.10
-# define ROT_SPEED 0.10
+# define MOVE_SPEED 3.0
+# define ROT_SPEED 3.0
+# define MOUSE_SPEED 0.003
 
 typedef struct	s_data
 {
@@ -97,12 +98,25 @@ typedef struct s_player
 	double	sin_rot;
 }	t_player;
 
+typedef struct s_key
+{
+	int	up;
+	int	down;
+	int	left;
+	int	right;
+	int	r_left;
+	int	r_right;
+}	t_key;
+
 typedef struct s_game
 {
 	void		*mlx_ptr;
 	void		*win_ptr;
 	int			frames;
 	double		last_time;
+	double		fps_last_time;
+	double		current_time;
+	double		frame_time;
 	double		fps;
 	t_list		*map_list;
 	t_data		img;
@@ -112,7 +126,7 @@ typedef struct s_game
 	char		**map;
 	int			colors[2];
 	int			map_height;
-
+	t_key		keys;
 }	t_game;
 //Game loop
 int		on_keypress(int keycode, t_game *game);
@@ -126,6 +140,10 @@ void	init_map(char *file, t_game *game);
 void	init_array(t_game *game);
 void	init_player(t_game *g, t_parser_state state);
 //Player move
+void	move_up(double new_x, double new_y, t_game *game);
+void	move_down(double new_x, double new_y, t_game *game);
+void	move_left(double new_x, double new_y, t_game *game);
+void	move_right(double new_x, double new_y, t_game *game);
 void	straight_move(int keycode, t_game *game);
 void	rotate_player(t_player *player, int direction);
 void	move_player(int keycode, t_game *game);

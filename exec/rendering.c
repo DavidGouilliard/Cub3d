@@ -24,7 +24,10 @@ t_line	init_line(t_line *line, int X, t_ray *ray, t_tex tex)
 {
 	line->x = X;
 	line->y = 0;
-	line->wallheight = (int) (WIN_H / ray->walldist);
+	if (ray->walldist < 0.0001)
+		line->wallheight = WIN_H;
+	else
+		line->wallheight = (int) (WIN_H / ray->walldist);
 	line->drawstart = WIN_H / 2 - (int) line->wallheight / 2;
 	line->drawend = (int) line->wallheight / 2 + WIN_H / 2;
 	line->tex_x = (int) (ray->wall_x * (double) tex.width);
