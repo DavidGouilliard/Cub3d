@@ -21,67 +21,54 @@ bool	line_bounds_ok(const char *line, size_t *start, size_t *end)
 	return (true);
 }
 
+static bool	is_closed_char(char c)
+{
+	return (c == '1' || c == ' ');
+}
+
 bool	wall_span_ok(const char *line, size_t x)
 {
 	size_t	len;
 	ssize_t	i;
-	bool	left;
-	bool	right;
 
 	len = trimmed_len(line);
 	if (len == 0)
 		return (false);
 	if (x >= len)
 		x = len - 1;
-	left = false;
 	i = (ssize_t)x;
-	while (i >= 0)
-	{
-		if (line[i] == '1')
-		{
-			left = true;
-			break ;
-		}
-		if (i == 0)
-			break ;
+	while (i >= 0 && line[i] != '1')
 		i--;
-	}
-	right = false;
+	if (i < 0)
+		return (false);
 	i = (ssize_t)x;
-	while ((size_t)i < len)
-	{
-		if (line[i] == '1')
-		{
-			right = true;
-			break ;
-		}
-		if ((size_t)i + 1 == len)
-			break ;
+	while ((size_t)i < len && line[i] != '1')
 		i++;
-	}
-	return (left && right);
+	return ((size_t)i < len);
 }
 
 bool	space_neighbors_ok(t_parser_state *st, size_t y, size_t x, size_t end)
 {
-	char	up;
-	char	down;
-	char	left;
-	char	right;
+	char	up = ' ';
+	char	down = ' ';
+	char	left = ' ';
+	char	right = ' ';
 
 	if (x == 0 || x + 1 >= end)
 		return (print_error("Espace adjacent a vide"), false);
 	if (!wall_span_ok(st->map_lines[y - 1], x)
 		|| !wall_span_ok(st->map_lines[y + 1], x))
 		return (print_error("Carte non fermee verticalement"), false);
-	up = (x < trimmed_len(st->map_lines[y - 1])) ? st->map_lines[y - 1][x] : ' ';
-	down = (x < trimmed_len(st->map_lines[y + 1])) ? st->map_lines[y + 1][x] : ' ';
-	left = (x == 0) ? ' ' : st->map_lines[y][x - 1];
-	right = (x + 1 < trimmed_len(st->map_lines[y])) ? st->map_lines[y][x + 1] : ' ';
-	if ((up != '1' && up != ' ')
-		|| (down != '1' && down != ' ')
-		|| (left != '1' && left != ' ')
-		|| (right != '1' && right != ' '))
+	if (x < trimmed_len(st->map_lines[y - 1]))
+		up = st->map_lines[y - 1][x];
+	if (x < trimmed_len(st->map_lines[y + 1]))
+		down = st->map_lines[y + 1][x];
+	if (x > 0)
+		left = st->map_lines[y][x - 1];
+	if (x + 1 < trimmed_len(st->map_lines[y]))
+		right = st->map_lines[y][x + 1];
+	if (!is_closed_char(up) || !is_closed_char(down)
+		|| !is_closed_char(left) || !is_closed_char(right))
 		return (print_error("Espace adjacent a vide"), false);
 	return (true);
 }
