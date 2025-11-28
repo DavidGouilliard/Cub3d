@@ -7,6 +7,7 @@ SRC =	main.c \
 	   	parser/parse_header/parse_header.c \
 	   	parser/parse_map/parse_map.c \
 	   	parser/parse_map/validate_map.c \
+	   	parser/parse_map/validate_map_utils.c \
 		exec/utils.c \
 		exec/raycasting.c \
 		exec/rendering.c \
