@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "cub3d.h"
+#include <stdio.h>
 
 int	main(int ac, char **av)
 {
@@ -23,6 +24,7 @@ int	main(int ac, char **av)
 		error_exit("Le fichier doit se terminer par .cub\n", game);
 	if (parse(av[1], &game) != 0)
 		error_exit("", game);
+	printf("ceiling color : %d\n", game->colors[0]);
 	/*print_map(game);*/
 	/*print_player(game);*/
 	game->win_ptr = mlx_new_window(game->mlx_ptr, WIN_W, WIN_H, "cube3d");

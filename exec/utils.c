@@ -19,7 +19,7 @@ void	free_game(t_game *game)
 	i = 0;
 	if (!game)
 		return ;
-	free_map(game->map);
+	free_map(game->map, game->map_height);
 	/*ft_lstclear(&(game->map_list), free);*/
 	if (game->win_ptr)
 		mlx_destroy_window(game->mlx_ptr, game->win_ptr);
@@ -45,14 +45,14 @@ void	error_exit(char *str, t_game *game)
 	exit(1);
 }
 
-void	free_map(char **map)
+void	free_map(char **map, int size)
 {
 	int	i;
 
 	i = 0;
 	if (!map)
 		return ;
-	while (map[i])
+	while (map[i] && i < size)
 	{
 		free(map[i]);
 		i++;

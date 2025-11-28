@@ -111,6 +111,7 @@ typedef struct s_game
 	char		*tex_path[TEX_TOTAL];
 	char		**map;
 	int			colors[2];
+	int			map_height;
 
 }	t_game;
 //Game loop
@@ -137,11 +138,11 @@ void	dda_analysis(t_game *game, t_ray *ray);
 t_ray	init_ray(t_game *game, int x);
 //Rendering
 void	my_mlx_pixel_put(t_data *data, int x, int y, int color);
-void	draw_column(t_ray *ray, int x, t_data *img, t_tex tex);
+void	draw_column(t_ray *ray, int x, t_game *game, t_tex tex);
 void	render(t_game *game);
 //Utils
 void	error_exit(char *str, t_game *game);
-void	free_map(char **map);
+void	free_map(char **map, int size);
 //Debug functions
 /*void	print_map(t_game *game);*/
 /*void	print_player(t_game *game);*/

@@ -62,6 +62,9 @@ t_game	*init_game(t_parser_state state)
 	game->fps = 0;
 	game->last_time = get_time();
 	game->map = state.map_lines;
+	game->map_height = state.map_height;
+	game->colors[0] = (state.ceiling.r << 16) + (state.ceiling.g << 8) + state.ceiling.b;
+	game->colors[1] = (state.floor.r << 16) + (state.floor.g << 8) + state.floor.b;
 	while (i < TEX_TOTAL)
 	{
 		game->wall_tex[i].img = NULL;

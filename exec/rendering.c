@@ -60,7 +60,7 @@ void	draw_tex_line(t_tex tex, t_line *line, t_data *img)
 		line->y++;
 	}
 }
-void	draw_column(t_ray *ray, int x, t_data *img, t_tex tex)
+void	draw_column(t_ray *ray, int x, t_game *game, t_tex tex)
 {
 	t_line line;
 
@@ -71,10 +71,10 @@ void	draw_column(t_ray *ray, int x, t_data *img, t_tex tex)
 		line.drawend = WIN_H - 1;
 	line.y = -1;
 	while (line.y++ < line.drawstart)
-		my_mlx_pixel_put(img, x, line.y, 0x87CEEB);
-	draw_tex_line(tex, &line, img);
+		my_mlx_pixel_put(&game->img, x, line.y, game->colors[0]);
+	draw_tex_line(tex, &line, &game->img);
 	while (line.y++ < WIN_H)
-		my_mlx_pixel_put(img, x, line.y, 0x332421);
+		my_mlx_pixel_put(&game->img, x, line.y, game->colors[1]);
 }
 
 int	get_wall_direction(t_ray ray)
@@ -108,6 +108,6 @@ void	render(t_game *game)
 		ray = init_ray(game, i);
 		dda_analysis(game, &ray);
 		direction = get_wall_direction(ray);
-		draw_column(&ray, i, &game->img, game->wall_tex[direction]);
+		draw_column(&ray, i, game, game->wall_tex[direction]);
 	}
 }
