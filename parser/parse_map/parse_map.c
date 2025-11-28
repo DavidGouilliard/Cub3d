@@ -56,7 +56,7 @@ static bool	push_line_resize(t_map_buffer *buf)
 		newcap = 8;
 	else
 		newcap = buf->capacity * 2;
-	tmp = malloc(sizeof(char *) * newcap);
+	tmp = ft_calloc(newcap, sizeof(char *));
 	if (!tmp)
 		return (false);
 	i = 0;
