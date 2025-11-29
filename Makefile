@@ -15,6 +15,8 @@ SRC =	main.c \
 		exec/player_move.c \
 		exec/debug.c \
 		exec/init.c \
+		exec/init_player.c \
+		exec/move_events.c \
 
 OBJ = $(SRC:.c=.o)
 INCLUDES = -I/usr/include -Imlx
@@ -23,7 +25,7 @@ MLX_LIB = $(MLX_DIR)/libmlx_Linux.a
 LIBFT = ./libft/libft.a
 MLX_FLAGS = -Lmlx -lmlx -L/usr/lib/X11 -lXext -lX11 -lm
 CFLAGS = -Wall -Wextra -Werror -g3
-NAME = cub3d
+NAME = cub3D
 
 all: $(LIBFT) $(MLX_LIB) $(NAME)
 

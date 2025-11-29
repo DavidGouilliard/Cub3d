@@ -6,7 +6,7 @@
 /*   By: dagouill <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 02:42:27 by dagouill          #+#    #+#             */
-/*   Updated: 2025/11/23 09:06:13 by dagouill         ###   ########.fr       */
+/*   Updated: 2025/11/29 01:18:22 by dagouill         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ void	free_game(t_game *game)
 	if (!game)
 		return ;
 	free_map(game->map, game->map_height);
-	/*ft_lstclear(&(game->map_list), free);*/
 	if (game->win_ptr)
 		mlx_destroy_window(game->mlx_ptr, game->win_ptr);
 	if (game->img.img)

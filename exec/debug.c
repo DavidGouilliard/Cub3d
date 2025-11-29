@@ -6,7 +6,7 @@
 /*   By: dagouill <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 19:57:35 by dagouill          #+#    #+#             */
-/*   Updated: 2025/11/23 19:59:51 by dagouill         ###   ########.fr       */
+/*   Updated: 2025/11/29 01:18:59 by dagouill         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@
 
 double	get_time(void)
 {
-	struct	timeval	tv;
+	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
 	return ((double)tv.tv_sec + (double)tv.tv_usec / 1000000.0);
@@ -73,7 +73,7 @@ void	display_fps(t_game *game)
 
 void	update_fps(t_game *game)
 {
-	double current_time;
+	double	current_time;
 
 	current_time = get_time();
 	game->frames++;
