@@ -27,7 +27,6 @@ static bool	parse_color_value(const char *payload, t_color *color, const char *l
 {
 	char	**parts;
 	int		values[3];
-	int		i;
 
 	if (color->set)
 	{
@@ -40,17 +39,8 @@ static bool	parse_color_value(const char *payload, t_color *color, const char *l
 		print_error(label);
 		return (false);
 	}
-	i = 0;
-	while (i < 3)
-	{
-		if (!parse_component(parts[i], &values[i]))
-		{
-			ft_free_split(parts);
-			print_error(label);
-			return (false);
-		}
-		i++;
-	}
+	if (!parse_color_components(parts, values, label))
+		return (false);
 	ft_free_split(parts);
 	color->r = values[0];
 	color->g = values[1];

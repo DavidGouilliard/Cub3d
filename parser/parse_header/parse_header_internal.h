@@ -13,5 +13,6 @@ bool	texture_payload_invalid(char *payload);
 bool	parse_component(const char *s, int *out);
 bool	texture_is_xpm(const char *path);
 bool	texture_unreadable(const char *path);
+bool	parse_color_components(char **parts, int values[3], const char *label);
 
 #endif

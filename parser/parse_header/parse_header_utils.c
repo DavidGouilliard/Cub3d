@@ -38,3 +38,23 @@ void	trim_trailing_spaces(char *str)
 		len--;
 	}
 }
+
+bool	parse_color_components(char **parts, int values[3], const char *label)
+{
+	int	i;
+	int	count;
+
+	count = 0;
+	while (parts[count])
+		count++;
+	if (count != 3)
+		return (ft_free_split(parts), print_error(label), false);
+	i = 0;
+	while (i < 3)
+	{
+		if (!parse_component(parts[i], &values[i]))
+			return (ft_free_split(parts), print_error(label), false);
+		i++;
+	}
+	return (true);
+}
