@@ -6,11 +6,12 @@
 /*   By: oettaqi <oettaqi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 10:02:51 by oettaqi           #+#    #+#             */
-/*   Updated: 2025/12/02 12:39:59 by oettaqi          ###   ########.fr       */
+/*   Updated: 2025/12/02 14:22:12 by oettaqi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../cub3d.h"
+#include <stdio.h>
 
 static void	init_state(t_parser_state *state)
 {
@@ -77,6 +78,8 @@ int	parse(const char *path, t_game **game)
 	if (!ok)
 		return (destroy_state(&state), 1);
 	*game = init_game(state);
+	if (!*game)
+		return (printf("par ici\n"), 1);
 	return (0);
 }
 

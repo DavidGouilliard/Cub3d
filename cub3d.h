@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dagouill <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: oettaqi <oettaqi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 02:31:50 by dagouill          #+#    #+#             */
-/*   Updated: 2025/11/23 09:47:25 by dagouill         ###   ########.fr       */
+/*   Updated: 2025/12/02 14:19:07 by oettaqi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,6 +170,7 @@ void	render(t_game *game);
 void	free_game(t_game *game);
 void	error_exit(char *str, t_game *game);
 void	free_map(char **map, int size);
+void	error_exit_parsing(t_game *game);
 //Debug functions
 double	get_time(void);
 void	display_fps(t_game *game);

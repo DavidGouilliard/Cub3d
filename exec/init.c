@@ -6,7 +6,7 @@
 /*   By: oettaqi <oettaqi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 20:17:00 by dagouill          #+#    #+#             */
-/*   Updated: 2025/12/02 12:08:51 by oettaqi          ###   ########.fr       */
+/*   Updated: 2025/12/02 14:21:21 by oettaqi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,6 @@ t_game	*init_game(t_parser_state state)
 	norminette_for_init(game, state);
 	while (i < TEX_TOTAL)
 	{
-		game->wall_tex[i].img = NULL;
 		game->tex_path[i] = state.tex_path[i];
 		i++;
 	}
