@@ -24,5 +24,9 @@
 
 char	*get_next_line(int fd);
 int		check_line(char *line);
+void	gnl_clear_leftover(void);
+char	**gnl_leftover_slot(void);
+char	*gnl_finalize_line(char **slot, char *final_line, char *left_over);
+char	*get_leftover(char *left_over);
 
 #endif

@@ -55,3 +55,31 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	dest[i] = 0;
 	return (dest);
 }
+
+char	*gnl_finalize_line(char **slot, char *final_line, char *left_over)
+{
+	if (!final_line)
+		return (free(*slot), *slot = NULL, NULL);
+	left_over = get_leftover(left_over);
+	*slot = left_over;
+	if (left_over && left_over[0] == 0)
+	{
+		free(left_over);
+		*slot = NULL;
+	}
+	if (final_line && final_line[0] == 0)
+		return (free(final_line), NULL);
+	return (final_line);
+}
+
+void	gnl_clear_leftover(void)
+{
+	char	**slot;
+
+	slot = gnl_leftover_slot();
+	if (*slot)
+	{
+		free(*slot);
+		*slot = NULL;
+	}
+}

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_header.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oettaqi <oettaqi@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/12/02 10:00:31 by oettaqi           #+#    #+#             */
+/*   Updated: 2025/12/02 10:00:35 by oettaqi          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "parse_header_internal.h"
 
 static bool	parse_texture_path(t_parser_state *state, int idx, char *payload)
@@ -93,12 +105,14 @@ bool	parse_header(int fd, t_parser_state *state, char **first_map_line)
 	char	*line;
 
 	*first_map_line = NULL;
-	while ((line = get_next_line(fd)))
+	line = get_next_line(fd);
+	while (line)
 	{
 		trim_newline(line);
 		if (line_is_empty(line))
 		{
 			free(line);
+			line = get_next_line(fd);
 			continue ;
 		}
 		if (looks_like_map_line(line))
@@ -106,6 +120,7 @@ bool	parse_header(int fd, t_parser_state *state, char **first_map_line)
 		if (!handle_identifier(line, state))
 			return (free(line), false);
 		free(line);
+		line = get_next_line(fd);
 	}
 	print_error("Carte manquante");
 	return (false);

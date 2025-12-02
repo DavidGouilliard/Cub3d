@@ -1,15 +1,23 @@
 #!/bin/sh
-# Lance cub3d sur toutes les cartes map/bad et vérifie que le parseur détecte une erreur.
+# Lance cub3d sur toutes les cartes map/bad, vérifie que le parseur détecte une erreur,
+# et contrôle les fuites mémoire avec Valgrind.
 
 set -u
 
-BIN="./cub3d"
+BIN="./cub3D"
 DIR="map/bad"
-ok=0
-ko=0
+PARSE_OK=0
+PARSE_KO=0
+LEAK_OK=0
+LEAK_KO=0
+VALGRIND="valgrind --leak-check=full --show-leak-kinds=all --errors-for-leak-kinds=all"
 
 if [ ! -x "$BIN" ]; then
 	echo "Binaire introuvable : $BIN (lance 'make' avant)" >&2
+	exit 1
+fi
+if ! command -v valgrind >/dev/null 2>&1; then
+	echo "Valgrind introuvable (installe-le pour les tests de fuite)" >&2
 	exit 1
 fi
 
@@ -17,20 +25,35 @@ for f in "$DIR"/*; do
 	if [ ! -f "$f" ]; then
 		continue
 	fi
-	printf "%-25s : " "$(basename "$f")"
+	name=$(basename "$f")
+	printf "%-25s : " "$name"
+
 	$BIN "$f" >/dev/null 2>&1
 	if [ $? -eq 0 ]; then
-		echo "KO (aucune erreur detectee)"
-		ko=$((ko + 1))
+		printf "KO (aucune erreur detectee)"
+		PARSE_KO=$((PARSE_KO + 1))
 	else
-		echo "OK (erreur attendue)"
-		ok=$((ok + 1))
+		printf "OK (erreur attendue)"
+		PARSE_OK=$((PARSE_OK + 1))
 	fi
+
+	log_file=$(mktemp)
+	$VALGRIND --error-exitcode=42 --log-file="$log_file" $BIN "$f" >/dev/null 2>&1
+	if grep -q "ERROR SUMMARY: 0 errors" "$log_file"; then
+		printf " | leaks: OK"
+		LEAK_OK=$((LEAK_OK + 1))
+	else
+		printf " | leaks: KO"
+		LEAK_KO=$((LEAK_KO + 1))
+	fi
+	rm -f "$log_file"
+	printf "\n"
 done
 
-echo "Bilan: $ok OK / $ko KO"
+echo "Bilan parse : $PARSE_OK OK / $PARSE_KO KO"
+echo "Bilan leaks : $LEAK_OK OK / $LEAK_KO KO"
 
-if [ $ko -ne 0 ]; then
+if [ $PARSE_KO -ne 0 ] || [ $LEAK_KO -ne 0 ]; then
 	exit 1
 fi
 

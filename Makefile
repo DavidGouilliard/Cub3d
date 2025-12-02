@@ -4,10 +4,13 @@ SRC =	main.c \
 		parser/string_utils.c \
 	   	parser/parse_header/parse_header_utils.c \
 	   	parser/parse_header/parse_header_checks.c \
+	   	parser/parse_header/parse_header_checks_utils.c \
 	   	parser/parse_header/parse_header.c \
 	   	parser/parse_map/parse_map.c \
+	   	parser/parse_map/map_buffer_utils.c \
 	   	parser/parse_map/validate_map.c \
 	   	parser/parse_map/validate_map_utils.c \
+	   	parser/parse_map/validate_map_neighbors.c \
 		exec/utils.c \
 		exec/raycasting.c \
 		exec/rendering.c \
@@ -16,7 +19,7 @@ SRC =	main.c \
 		exec/debug.c \
 		exec/init.c \
 		exec/init_player.c \
-		exec/move_events.c \
+		exec/move_events.c
 
 OBJ = $(SRC:.c=.o)
 INCLUDES = -I/usr/include -Imlx

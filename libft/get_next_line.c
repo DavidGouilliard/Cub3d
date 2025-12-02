@@ -13,6 +13,13 @@
 #include "get_next_line.h"
 #include "libft.h"
 
+char	**gnl_leftover_slot(void)
+{
+	static char	*leftover;
+
+	return (&leftover);
+}
+
 char	*trimline(char *line)
 {
 	int		i;
@@ -81,40 +88,22 @@ char	*ft_read_and_conc(int fd, char *left_over)
 	return (left_over);
 }
 
-int	initialize_leftover(char **left_over)
-{
-	if (!*left_over)
-		return (0);
-	else
-		return (1);
-}
-
 char	*get_next_line(int fd)
 {
-	static char		*left_over;
+	char			**slot;
+	char			*left_over;
 	char			*final_line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
+	slot = gnl_leftover_slot();
+	left_over = *slot;
 	if (!left_over)
 		left_over = ft_strdup("");
 	left_over = ft_read_and_conc(fd, left_over);
+	*slot = left_over;
 	final_line = trimline(left_over);
-	if (!final_line)
-	{
-		free(left_over);
-		left_over = NULL;
-		return (NULL);
-	}
-	left_over = get_leftover(left_over);
-	if (left_over && left_over[0] == 0)
-	{
-		free(left_over);
-		left_over = NULL;
-	}
-	if (final_line && final_line[0] == 0)
-		return (free(final_line), NULL);
-	return (final_line);
+	return (gnl_finalize_line(slot, final_line, left_over));
 }
 /*
 #include <fcntl.h>

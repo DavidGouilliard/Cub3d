@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dagouill <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: oettaqi <oettaqi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 02:42:27 by dagouill          #+#    #+#             */
-/*   Updated: 2025/11/29 01:18:22 by dagouill         ###   ########.fr       */
+/*   Updated: 2025/12/02 12:27:02 by oettaqi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void	free_map(char **map, int size)
 	i = 0;
 	if (!map)
 		return ;
-	while (map[i] && i < size)
+	while (i < size && map[i])
 	{
 		free(map[i]);
 		i++;
