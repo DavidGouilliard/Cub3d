@@ -10,6 +10,8 @@ typedef struct s_map_buffer
 	size_t	capacity;
 }	t_map_buffer;
 
+void	init_map_buffer(t_map_buffer *buf);
+void	free_map_buffer(t_map_buffer *buf);
 size_t	trimmed_len(const char *line);
 bool	line_bounds_ok(const char *line, size_t *start, size_t *end);
 bool	wall_span_ok(const char *line, size_t x);

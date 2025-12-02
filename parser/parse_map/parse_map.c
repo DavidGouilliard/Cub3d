@@ -1,30 +1,6 @@
 #include "parse_map_internal.h"
 
 
-static void	init_map_buffer(t_map_buffer *buf)
-{
-	buf->lines = NULL;
-	buf->size = 0;
-	buf->capacity = 0;
-}
-
-
-static void	free_map_buffer(t_map_buffer *buf)
-{
-	size_t	i;
-
-	if (!buf->lines)
-		return ;
-	i = 0;
-	while (i < buf->size)
-	{
-		free(buf->lines[i]);
-		i++;
-	}
-	free(buf->lines);
-}
-
-
 static bool	push_line_resize(t_map_buffer *buf)
 {
 	char	**tmp;
@@ -99,6 +75,20 @@ static bool	handle_map_line(t_map_buffer *buf, t_parser_state *st, char *line)
 }
 
 
+static bool	finalize_map_parse(bool ok, t_parser_state *state, t_map_buffer *buf)
+{
+	if (!ok || state->player_count != 1)
+	{
+		if (ok && state->player_count != 1)
+			print_error("Joueur absent ou multiple");
+		free_map_buffer(buf);
+		return (false);
+	}
+	state->map_lines = buf->lines;
+	return (true);
+}
+
+
 bool	parse_map(int fd, t_parser_state *state, char *first_map_line)
 {
 	t_map_buffer	buf;
@@ -121,13 +111,5 @@ bool	parse_map(int fd, t_parser_state *state, char *first_map_line)
 			ok = handle_map_line(&buf, state, line);
 		free(line);
 	}
-	if (!ok || state->player_count != 1)
-	{
-		if (ok && state->player_count != 1)
-			print_error("Joueur absent ou multiple");
-		free_map_buffer(&buf);
-		return (false);
-	}
-	state->map_lines = buf.lines;
-	return (true);
+	return (finalize_map_parse(ok, state, &buf));
 }

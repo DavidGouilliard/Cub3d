@@ -2,7 +2,7 @@
 
 bool	ft_isspace(char c)
 {
-	return (c == ' ' || c == '\t');
+	return (c == ' ');
 }
 
 void	ft_free_split(char **tab)
