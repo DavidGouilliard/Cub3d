@@ -45,12 +45,12 @@ void	load_textures(t_game *game)
 
 void	init_keys(t_game *game)
 {
-		game->keys.up = 0;
-		game->keys.down = 0;
-		game->keys.left = 0;
-		game->keys.right = 0;
-		game->keys.r_left = 0;
-		game->keys.r_right = 0;
+	game->keys.up = 0;
+	game->keys.down = 0;
+	game->keys.left = 0;
+	game->keys.right = 0;
+	game->keys.r_left = 0;
+	game->keys.r_right = 0;
 }
 
 void	norminette_for_init(t_game *game, t_parser_state state)

@@ -12,15 +12,11 @@
 
 #include "../cub3d.h"
 
-t_line	init_line(t_line *line, int X, t_ray *ray, t_tex tex)
+void	init_line(t_line *line, int X, t_ray *ray, t_tex tex)
 {
-	ray->wall_x -= floor(ray->wall_x);
 	line->x = X;
 	line->y = 0;
-	if (ray->walldist < 0.0001)
-		line->wallheight = WIN_H;
-	else
-		line->wallheight = (int)(WIN_H / ray->walldist);
+	line->wallheight = (int)(WIN_H / ray->walldist);
 	line->drawstart = WIN_H / 2 - (int) line->wallheight / 2;
 	line->drawend = (int) line->wallheight / 2 + WIN_H / 2;
 	line->tex_x = (int)(ray->wall_x * (double) tex.width);
@@ -33,7 +29,6 @@ t_line	init_line(t_line *line, int X, t_ray *ray, t_tex tex)
 	if (ray->horizontalwall == 1 && ray->raydiry > 0)
 		line->tex_x = tex.width - 1 - line->tex_x;
 	line->tex_y = 0;
-	return (*line);
 }
 
 void	draw_tex_line(t_tex tex, t_line *line, t_data *img, char **dst)
@@ -42,7 +37,9 @@ void	draw_tex_line(t_tex tex, t_line *line, t_data *img, char **dst)
 	double				tex_pos;
 	unsigned int		color;
 	long				offset;
+	long				col_offset;
 
+	col_offset = line->tex_x * tex.bits_per_pixel / 8;
 	tex_step = 1.0 * tex.height / line->wallheight;
 	tex_pos = (line->drawstart - WIN_H / 2 + line->wallheight / 2) * tex_step;
 	line->y = line->drawstart;
@@ -50,12 +47,8 @@ void	draw_tex_line(t_tex tex, t_line *line, t_data *img, char **dst)
 	{
 		line->tex_y = (int) tex_pos & (tex.height - 1);
 		tex_pos += tex_step;
-		if (line->tex_y < 0)
-			line->tex_y = 0;
-		if (line->tex_y >= tex.height)
-			line->tex_y = tex.height - 1;
 		offset = ((long)line->tex_y * tex.line_length)
-			+ (line->tex_x * (tex.bits_per_pixel / 8));
+			+ col_offset;
 		color = *(unsigned int *)(tex.addr + offset);
 		*(unsigned int *)(*dst) = color;
 		*dst += img->line_length;
@@ -69,7 +62,7 @@ void	draw_column(t_ray *ray, int x, t_game *game, t_tex tex)
 	char	*dst;
 
 	dst = game->img.addr + (x * (game->img.bits_per_pixel / 8));
-	line = init_line(&line, x, ray, tex);
+	init_line(&line, x, ray, tex);
 	if (line.drawstart < 0)
 		line.drawstart = 0;
 	if (line.drawend >= WIN_H)
@@ -118,7 +111,7 @@ void	render(t_game *game)
 	initialize_ray(&ray);
 	while (++i < WIN_W)
 	{
-		ray = init_ray(game, i);
+		init_ray(game, i, &ray);
 		dda_analysis(game, &ray);
 		direction = get_wall_direction(ray);
 		draw_column(&ray, i, game, game->wall_tex[direction]);

@@ -159,9 +159,9 @@ void	initialize_ray(t_ray *ray);
 void	ray_directions(t_game *game, t_ray *ray);
 void	dda_step(t_ray *ray);
 void	dda_analysis(t_game *game, t_ray *ray);
-t_ray	init_ray(t_game *game, int x);
+void	init_ray(t_game *game, int x, t_ray *ray);
 //Rendering
-t_line	init_line(t_line *line, int X, t_ray *ray, t_tex tex);
+void	init_line(t_line *line, int X, t_ray *ray, t_tex tex);
 void	draw_tex_line(t_tex tex, t_line *line, t_data *img, char **dst);
 void	draw_column(t_ray *ray, int x, t_game *game, t_tex tex);
 int		get_wall_direction(t_ray ray);

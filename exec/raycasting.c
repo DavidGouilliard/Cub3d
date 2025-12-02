@@ -95,27 +95,25 @@ void	dda_analysis(t_game *game, t_ray *ray)
 				+ (1 - ray->stepy) / 2) / ray->raydiry;
 		ray->wall_x = game->player.x + ray->walldist * ray->raydirx;
 	}
+	ray->wall_x -= floor(ray->wall_x);
 }
 
-t_ray	init_ray(t_game *game, int x)
+void	init_ray(t_game *game, int x, t_ray *ray)
 {
-	t_ray	ray;
-
-	ray.camerax = 2 * x / (double)WIN_W - 1;
-	ray.raydirx = game->player.dir_x + game->player.plane_x * ray.camerax;
-	ray.raydiry = game->player.dir_y + game->player.plane_y * ray.camerax;
-	ray.mapx = (int)game->player.x;
-	ray.mapy = (int)game->player.y;
-	if (ray.raydirx == 0)
-		ray.deltadistx = 1e30;
+	ray->camerax = 2 * x / (double)WIN_W - 1;
+	ray->raydirx = game->player.dir_x + game->player.plane_x * ray->camerax;
+	ray->raydiry = game->player.dir_y + game->player.plane_y * ray->camerax;
+	ray->mapx = (int)game->player.x;
+	ray->mapy = (int)game->player.y;
+	if (ray->raydirx == 0)
+		ray->deltadistx = 1e30;
 	else
-		ray.deltadistx = fabs(1 / ray.raydirx);
-	if (ray.raydiry == 0)
-		ray.deltadisty = 1e30;
+		ray->deltadistx = fabs(1 / ray->raydirx);
+	if (ray->raydiry == 0)
+		ray->deltadisty = 1e30;
 	else
-		ray.deltadisty = fabs(1 / ray.raydiry);
-	ray_directions(game, &ray);
-	ray.horizontalwall = 0;
-	ray.walldist = 0;
-	return (ray);
+		ray->deltadisty = fabs(1 / ray->raydiry);
+	ray_directions(game, ray);
+	ray->horizontalwall = 0;
+	ray->walldist = 0;
 }
