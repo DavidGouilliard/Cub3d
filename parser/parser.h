@@ -1,27 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing.h                                          :+:      :+:    :+:   */
+/*   parser.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: othmaneettaqi <othmaneettaqi@student.42    +#+  +:+       +#+        */
+/*   By: oettaqi <oettaqi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/17 11:40:59 by othmaneetta       #+#    #+#             */
-/*   Updated: 2025/11/27 05:36:27 by dagouill         ###   ########.fr       */
+/*   Updated: 2025/12/02 13:35:37 by oettaqi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSING_H
-# define PARSING_H
+#ifndef PARSER_H
+# define PARSER_H
 
 # include <stdbool.h>
 # include <unistd.h>
 # include <fcntl.h>
 # include "cub3d.h"
-#ifndef BUFFER_SIZE
-#define BUFFER_SIZE 1024
-#endif
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 1024
+# endif
 
-typedef struct s_game t_game;
+typedef struct s_game	t_game;
 
 typedef enum e_texture
 {

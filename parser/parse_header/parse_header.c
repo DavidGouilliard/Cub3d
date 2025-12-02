@@ -6,7 +6,7 @@
 /*   By: oettaqi <oettaqi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 10:00:31 by oettaqi           #+#    #+#             */
-/*   Updated: 2025/12/02 10:00:35 by oettaqi          ###   ########.fr       */
+/*   Updated: 2025/12/02 13:35:58 by oettaqi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ static bool	parse_texture_path(t_parser_state *state, int idx, char *payload)
 	return (true);
 }
 
-static bool	parse_color_value(const char *payload, t_color *color, const char *label)
+static bool	parse_color_value(const char *payload,
+	t_color *color, const char *label)
 {
 	char	**parts;
 	int		values[3];

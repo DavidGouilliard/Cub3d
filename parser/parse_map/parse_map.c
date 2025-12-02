@@ -6,7 +6,7 @@
 /*   By: oettaqi <oettaqi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/02 10:02:06 by oettaqi           #+#    #+#             */
-/*   Updated: 2025/12/02 12:41:30 by oettaqi          ###   ########.fr       */
+/*   Updated: 2025/12/02 13:36:25 by oettaqi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,8 @@ static bool	handle_map_line(t_map_buffer *buf, t_parser_state *st, char *line)
 	i = 0;
 	while (line[i])
 	{
-		if (line[i] == 'N' || line[i] == 'S' || line[i] == 'E' || line[i] == 'W')
+		if (line[i] == 'N' || line[i] == 'S'
+			|| line[i] == 'E' || line[i] == 'W')
 		{
 			if (st->player_count++ > 0)
 				return (print_error("Joueur multiple"), false);
@@ -81,7 +82,8 @@ static bool	handle_map_line(t_map_buffer *buf, t_parser_state *st, char *line)
 	return (push_line(buf, line, st));
 }
 
-static bool	finalize_map_parse(bool ok, t_parser_state *state, t_map_buffer *buf)
+static bool	finalize_map_parse(bool ok, t_parser_state *state,
+	t_map_buffer *buf)
 {
 	if (!ok || state->player_count != 1)
 	{
