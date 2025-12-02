@@ -56,8 +56,8 @@ static bool	handle_map_line(t_map_buffer *buf, t_parser_state *st, char *line)
 	i = 0;
 	while (line[i])
 	{
-		if (line[i] == '\t')
-			line[i] = ' ';
+		// if (line[i] == '\t')
+		// 	line[i] = ' ';
 		if (line[i] == 'N' || line[i] == 'S' || line[i] == 'E' || line[i] == 'W')
 		{
 			if (st->player_count++ > 0)
